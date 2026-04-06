@@ -1,7 +1,7 @@
 # Quantara - AI-Powered Data Intelligence Platform
 
 <p align="center">
-  <img src="/Tech Logo - New Group.png" alt="Quantara Logo" width="200"/>
+  <img src="public/Tech Logo - New Group.png" alt="Quantara Logo" width="200"/>
 </p>
 
 <p align="center">
