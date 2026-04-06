@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void | Promise<void>;
+  onCloseAction: () => void;
+  onConfirmAction: () => void | Promise<void>;
   title: string;
   message: string;
   confirmText?: string;
@@ -19,8 +19,8 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({
   isOpen,
-  onClose,
-  onConfirm,
+  onCloseAction,
+  onConfirmAction,
   title,
   message,
   confirmText = "Confirm", 
@@ -29,16 +29,16 @@ export function ConfirmDialog({
   isLoading = false,
 }: ConfirmDialogProps) {
   const handleConfirm = async () => {
-    await onConfirm();
-    onClose();
+    await onConfirmAction();
+    onCloseAction();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} className="max-w-md">
+    <Modal isOpen={isOpen} onCloseAction={onCloseAction} title={title} className="max-w-md">
       <div className="space-y-4">
         <p className="text-sm text-zinc-600">{message}</p>
         <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button variant="outline" onClick={onCloseAction} disabled={isLoading}>
             {cancelText}
           </Button>
           <Button
@@ -56,7 +56,7 @@ export function ConfirmDialog({
 
 interface AlertDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onCloseAction: () => void;
   title: string;
   message: string;
   variant?: "info" | "error" | "success";
@@ -64,7 +64,7 @@ interface AlertDialogProps {
 
 export function AlertDialog({
   isOpen,
-  onClose,
+  onCloseAction,
   title,
   message,
   variant = "info",
@@ -78,14 +78,14 @@ export function AlertDialog({
   const currentConfig = config[variant];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} className="max-w-md">
+    <Modal isOpen={isOpen} onCloseAction={onCloseAction} title={title} className="max-w-md">
       <div className="space-y-4">
         <div className={cn("flex items-start gap-3 p-3 rounded-lg", currentConfig.bg)}>
           <currentConfig.icon className={cn("w-5 h-5 flex-shrink-0 mt-0.5", currentConfig.text)} />
           <p className="text-sm text-zinc-700">{message}</p>
         </div>
         <div className="flex justify-end">
-          <Button onClick={onClose}>OK</Button>
+          <Button onClick={onCloseAction}>OK</Button>
         </div>
       </div>
     </Modal>

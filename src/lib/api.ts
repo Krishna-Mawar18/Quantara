@@ -126,6 +126,10 @@ export async function fetchDataset(id: string): Promise<{
   return apiFetch(`/api/datasets/${id}`);
 }
 
+export async function fetchDatasetData(id: string, limit = 1000): Promise<Record<string, unknown>[]> {
+  return apiFetch(`/api/datasets/${id}/data?limit=${limit}`);
+}
+
 export async function deleteDataset(id: string): Promise<{ status: string }> {
   return apiFetch(`/api/datasets/${id}`, { method: "DELETE" });
 }

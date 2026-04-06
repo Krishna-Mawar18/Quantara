@@ -267,8 +267,8 @@ export default function UploadPage() {
 
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
-        onClose={confirmDialog.handleCancel}
-        onConfirm={confirmDialog.handleConfirm}
+        onCloseAction={confirmDialog.handleCancel}
+        onConfirmAction={confirmDialog.handleConfirm}
         title={confirmDialog.options.title}
         message={confirmDialog.options.message}
         confirmText={confirmDialog.options.confirmText}
@@ -278,7 +278,7 @@ export default function UploadPage() {
 
       <AlertDialog
         isOpen={alertDialog.isOpen}
-        onClose={alertDialog.handleClose}
+        onCloseAction={alertDialog.handleClose}
         title={alertDialog.options.title}
         message={alertDialog.options.message}
         variant={alertDialog.options.variant}

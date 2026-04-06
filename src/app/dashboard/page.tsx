@@ -22,8 +22,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
-import { CustomLineChart } from "@/components/charts/line-chart";
 import { useDatasetStore } from "@/store/dataset";
+import { CustomLineChart } from "@/components/charts/line-chart";
 import { deleteDataset } from "@/lib/api";
 import { cachedGetPlanInfo } from "@/lib/cached-api";
 import { formatBytes } from "@/lib/utils";
@@ -386,8 +386,8 @@ export default function DashboardPage() {
 
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
-        onClose={confirmDialog.handleCancel}
-        onConfirm={confirmDialog.handleConfirm}
+        onCloseAction={confirmDialog.handleCancel}
+        onConfirmAction={confirmDialog.handleConfirm}
         title={confirmDialog.options.title}
         message={confirmDialog.options.message}
         confirmText={confirmDialog.options.confirmText}
@@ -397,7 +397,7 @@ export default function DashboardPage() {
 
       <AlertDialog
         isOpen={alertDialog.isOpen}
-        onClose={alertDialog.handleClose}
+        onCloseAction={alertDialog.handleClose}
         title={alertDialog.options.title}
         message={alertDialog.options.message}
         variant={alertDialog.options.variant}

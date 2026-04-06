@@ -6,16 +6,16 @@ import { cn } from "@/lib/utils";
 
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onCloseAction: () => void;
   title: string;
   children: ReactNode;
   className?: string;
 }
 
-export function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
+export function Modal({ isOpen, onCloseAction, title, children, className }: ModalProps) {
   const handleEscape = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") onClose();
-  }, [onClose]);
+    if (e.key === "Escape") onCloseAction();
+  }, [onCloseAction]);
 
   useEffect(() => {
     if (isOpen) {
@@ -39,7 +39,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     >
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
-        onClick={onClose}
+        onClick={onCloseAction}
         aria-hidden="true"
       />
       <div
@@ -53,7 +53,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             {title}
           </h2>
           <button
-            onClick={onClose}
+            onClick={onCloseAction}
             className="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition-colors"
             aria-label="Close modal"
           >
