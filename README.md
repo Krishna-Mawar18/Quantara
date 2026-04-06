@@ -9,14 +9,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/your-repo/quantara/stargazers">
-    <img src="https://img.shields.io/github/stars/your-repo/quantara?style=flat-square" alt="Stars"/>
+  <a href="https://github.com/DarkSpark18/Quantara/stargazers">
+    <img src="https://img.shields.io/github/stars/DarkSpark18/Quantara?style=flat-square" alt="Stars"/>
   </a>
-  <a href="https://github.com/your-repo/quantara/issues">
-    <img src="https://img.shields.io/github/issues/your-repo/quantara?style=flat-square" alt="Issues"/>
+  <a href="https://github.com/DarkSpark18/Quantara/issues">
+    <img src="https://img.shields.io/github/issues/DarkSpark18/Quantara?style=flat-square" alt="Issues"/>
   </a>
-  <a href="https://github.com/your-repo/quantara/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/your-repo/quantara?style=flat-square" alt="License"/>
+  <a href="https://github.com/DarkSpark18/Quantara/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/DarkSpark18/Quantara?style=flat-square" alt="License"/>
   </a>
 </p>
 
@@ -71,8 +71,8 @@
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-repo/quantara.git
-cd quantara
+git clone https://github.com/DarkSpark18/Quantara.git
+cd Quantara/quantara
 npm install
 ```
 
@@ -247,6 +247,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+---
+
+<p align="center">
+  <a href="https://github.com/DarkSpark18">DarkSpark18</a> • MIT License
+</p>
 
 ---
 
