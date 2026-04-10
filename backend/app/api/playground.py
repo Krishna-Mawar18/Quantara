@@ -337,6 +337,95 @@ def validate_formula(
     return service.validate_formula(formula)
 
 
+@router.post("/predict-download")
+async def predict_download(
+    dataset_id: str = Form(...),
+    file: UploadFile = File(...),
+    target_column: str = Form(...),
+    feature_columns: str = Form("[]"),
+    model_key: str = Form("random_forest"),
+    hyperparameters: str = Form("{}"),
+    validation_config: str = Form("{}"),
+    derived_features: str = Form("[]"),
+    current_user: dict = Depends(get_current_user),
+):
+    """Predict and download results as CSV"""
+    logger.info(
+        f"Predict download request - dataset_id: {dataset_id}, target: {target_column}"
+    )
+
+    try:
+        check_prediction_allowed(current_user["id"])
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Plan check error: {e}")
+        raise HTTPException(status_code=500, detail="Plan check failed")
+
+    feature_cols = json.loads(feature_columns) if feature_columns else []
+    hyperparams = json.loads(hyperparameters) if hyperparameters else {}
+    val_config = json.loads(validation_config) if validation_config else {}
+    derived_feats = json.loads(derived_features) if derived_features else []
+
+    train_df, _ = _get_dataset_df(dataset_id, current_user)
+
+    service = FeatureEngineeringService(train_df)
+    for feat in derived_feats:
+        name = feat.get("name")
+        formula = feat.get("formula")
+        if name and formula:
+            train_df = service.add_column(name, formula)
+
+    predictor = PlaygroundPredictor(
+        train_df,
+        target_column,
+        feature_columns=feature_cols if feature_cols else None,
+    )
+
+    predictor.train(
+        model_key=model_key,
+        hyperparameters=hyperparams,
+        validation_config=val_config,
+    )
+
+    contents = await file.read()
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename else "csv"
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp:
+        tmp.write(contents)
+        tmp_path = tmp.name
+
+    try:
+        if ext == "csv":
+            new_df = pd.read_csv(tmp_path)
+        else:
+            new_df = pd.read_excel(tmp_path)
+    finally:
+        os.unlink(tmp_path)
+
+    result = predictor.predict_on_data(new_df)
+    log_prediction(current_user["id"])
+
+    predictions = result.get("predictions", [])
+
+    from fastapi.responses import StreamingResponse
+    import io
+
+    output = io.StringIO()
+    if predictions:
+        pd.DataFrame(predictions).to_csv(output, index=False)
+    else:
+        output.write("No predictions generated")
+
+    output.seek(0)
+
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=predictions.csv"},
+    )
+
+
 def _clean_value(v):
     if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
         return None

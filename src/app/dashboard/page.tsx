@@ -24,7 +24,8 @@ import {
 import Link from "next/link";
 import { useDatasetStore } from "@/store/dataset";
 import { CustomLineChart } from "@/components/charts/line-chart";
-import { deleteDataset } from "@/lib/api";
+import { CustomBarChart } from "@/components/charts/bar-chart";
+import { deleteDataset, getPredictionsPerWeek } from "@/lib/api";
 import { cachedGetPlanInfo } from "@/lib/cached-api";
 import { formatBytes } from "@/lib/utils";
 
@@ -45,10 +46,11 @@ export default function DashboardPage() {
   const [planInfo, setPlanInfo] = useState<{
     plan: string;
     limits: { datasets: number; rows_per_dataset: number; predictions_per_month: number };
-    usage: { datasets: number };
+    usage: { datasets: number; predictions?: number };
   } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [predictionsPerWeek, setPredictionsPerWeek] = useState<{ day: string; predictions: number }[]>([]);
 
   const confirmDialog = useConfirm();
   const alertDialog = useAlert();
@@ -59,6 +61,10 @@ export default function DashboardPage() {
     cachedGetPlanInfo()
       .then(setPlanInfo)
       .catch(() => cachedGetPlanInfo({ skipCache: false }).then(setPlanInfo).catch(() => {}));
+    
+    getPredictionsPerWeek()
+      .then((res) => setPredictionsPerWeek(res.data))
+      .catch(() => {});
   }, [fetchDatasets]);
 
   const handleRefresh = useCallback(async () => {
@@ -66,6 +72,9 @@ export default function DashboardPage() {
     await fetchDatasets(true);
     await cachedGetPlanInfo({ skipCache: true })
       .then(setPlanInfo)
+      .catch(() => {});
+    await getPredictionsPerWeek()
+      .then((res) => setPredictionsPerWeek(res.data))
       .catch(() => {});
     setIsRefreshing(false);
   }, [fetchDatasets]);
@@ -245,13 +254,13 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-zinc-700">Prediction Limits</span>
             <span className="text-sm text-zinc-500">
-              {planInfo ? `${planInfo.usage.datasets} / ${planInfo.limits.predictions_per_month === -1 ? "∞" : planInfo.limits.predictions_per_month}` : "Loading..."}
+              {planInfo ? `${planInfo.usage.predictions ?? 0} / ${planInfo.limits.predictions_per_month === -1 ? "∞" : planInfo.limits.predictions_per_month}` : "Loading..."}
             </span>
           </div>
           <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all bg-violet-600"
-              style={{ width: planInfo ? `${Math.min((planInfo.usage.datasets / (planInfo.limits.predictions_per_month === -1 ? planInfo.usage.datasets : planInfo.limits.predictions_per_month)) * 100, 100)}%` : "0%" }}
+              className={`h-full rounded-full transition-all ${planInfo && (planInfo.usage.predictions ?? 0) >= planInfo.limits.predictions_per_month ? "bg-red-500" : "bg-violet-600"}`}
+              style={{ width: planInfo ? `${Math.min(((planInfo.usage.predictions ?? 0) / (planInfo.limits.predictions_per_month === -1 ? 1 : planInfo.limits.predictions_per_month)) * 100, 100)}%` : "0%" }}
             />
           </div>
         </div>
@@ -359,6 +368,23 @@ export default function DashboardPage() {
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-[1px]">
           <div className="bg-white rounded-3xl p-6">
             <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-violet-500/20">
+                  <FlaskConical className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-zinc-900">Predictions</h2>
+                  <p className="text-sm text-zinc-500">This week</p>
+                </div>
+              </div>
+            </div>
+            <CustomBarChart data={predictionsPerWeek} xKey="day" yKey="predictions" color="#9146FF" />
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-[1px]">
+          <div className="bg-white rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-11">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-violet-500/20">
                   <Lightbulb className="w-5 h-5 text-white" />

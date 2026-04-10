@@ -30,6 +30,24 @@ def get_user_dataset_count(user_id: str) -> int:
     return result.count or 0
 
 
+def get_user_prediction_count(user_id: str) -> int:
+    supabase = get_supabase()
+    from datetime import datetime, timezone
+
+    start_of_month = datetime.now(timezone.utc).replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
+
+    result = (
+        supabase.table("predictions_log")
+        .select("id", count="exact")
+        .eq("user_id", user_id)
+        .gte("created_at", start_of_month.isoformat())
+        .execute()
+    )
+    return result.count or 0
+
+
 def check_upload_allowed(user_id: str, row_count: int) -> None:
     plan = get_user_plan(user_id)
     limits = plan["limits"]

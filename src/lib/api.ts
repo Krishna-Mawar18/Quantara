@@ -263,9 +263,14 @@ export async function getPlanInfo(): Promise<{
   features: string[];
   usage: {
     datasets: number;
+    predictions?: number;
   };
 }> {
   return apiFetch("/api/plan");
+}
+
+export async function getPredictionsPerWeek(): Promise<{ data: { day: string; predictions: number }[] }> {
+  return apiFetch("/api/predictions-weekly");
 }
 
 export async function playgroundGetDatasetPreview(datasetId: string): Promise<{

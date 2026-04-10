@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import {
   BarChart3,
   Database,
-  CreditCard,
   Settings,
   LayoutDashboard,
   LogOut,
@@ -21,7 +20,6 @@ const navItems = [
   { href: "/dashboard/upload", label: "Data", icon: Database },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/playground", label: "Playground", icon: FlaskConical },
-  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -33,7 +31,7 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-full w-[240px] bg-white border-r border-zinc-100 flex flex-col z-30">
       <div className="px-5 py-5">
-        <Link href="/dashboard" className="flex items-center gap-2.5 group">
+        <Link href="/dashboard" className="flex items-center group">
           <div className="w-8 h-8 relative">
             <Image
               src="/Tech Logo - New Group.png"
@@ -82,7 +80,6 @@ export function Sidebar() {
               {user?.email || ""}
             </p>
           </div>
-          <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
         </div>
         <button
           onClick={logout}

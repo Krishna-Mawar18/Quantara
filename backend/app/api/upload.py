@@ -146,10 +146,15 @@ def delete_dataset(
 
 @router.get("/plan")
 def get_user_plan_info(current_user: dict = Depends(get_current_user)):
-    from app.core.plan_enforcement import get_user_plan, get_user_dataset_count
+    from app.core.plan_enforcement import (
+        get_user_plan,
+        get_user_dataset_count,
+        get_user_prediction_count,
+    )
 
     plan = get_user_plan(current_user["id"])
     dataset_count = get_user_dataset_count(current_user["id"])
+    prediction_count = get_user_prediction_count(current_user["id"])
 
     return {
         "plan": plan["name"],
@@ -157,5 +162,42 @@ def get_user_plan_info(current_user: dict = Depends(get_current_user)):
         "features": plan["features"],
         "usage": {
             "datasets": dataset_count,
+            "predictions": prediction_count,
         },
     }
+
+
+@router.get("/predictions-weekly")
+def get_predictions_per_week(current_user: dict = Depends(get_current_user)):
+    from app.core.plan_enforcement import get_user_prediction_count
+    from datetime import datetime, timedelta, timezone
+
+    supabase = get_supabase()
+
+    week_data = []
+    day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    today = datetime.now(timezone.utc).date()
+    start_of_week = today - timedelta(days=today.weekday())
+
+    for i in range(7):
+        day_date = start_of_week + timedelta(days=i)
+        start_of_day = datetime.combine(day_date, datetime.min.time()).replace(
+            tzinfo=timezone.utc
+        )
+        end_of_day = datetime.combine(day_date, datetime.max.time()).replace(
+            tzinfo=timezone.utc
+        )
+
+        result = (
+            supabase.table("predictions_log")
+            .select("id", count="exact")
+            .eq("user_id", current_user["id"])
+            .gte("created_at", start_of_day.isoformat())
+            .lte("created_at", end_of_day.isoformat())
+            .execute()
+        )
+
+        week_data.append({"day": day_names[i], "predictions": result.count or 0})
+
+    return {"data": week_data}
